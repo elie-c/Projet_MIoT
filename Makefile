@@ -1,15 +1,35 @@
+####################
+# User config
+####################
+
+TARGET_BOARD = MPPT
+# TARGET_BOARD = DISCOVERY
+
+SRC_FOLDER = ./src.old
+USE_ST_HAL = false
+
+####################
+
 # Variables specific to the board we use
+
+ifeq ($(TARGET_BOARD),MPPT)
+LINKER_SCRIPT = STM32F030x4.ld
+
+# Note: from smt32f0xx.h: STM32F030x6 is for both STM32F030x4 and STM32F030x6
+MAPPED_DEVICE = STM32F030x6
+else
+LINKER_SCRIPT = STM32F051x8.ld 
+
+MAPPED_DEVICE = STM32F051x8
+endif
 
 FLASH  = 0x08000000
 
-# USE_ST_CMSIS = true
-USE_ST_HAL = true
-
-LINKER_SCRIPT = STM32F051x8.ld
-
 SERIES_FOLDER = STM32F0xx
 
-MAPPED_DEVICE = STM32F051x8
+
+#USE_ST_CMSIS = true
+USE_ST_HAL ?= true
 
 STARTUP_FOLDER = ./startup
 
@@ -40,6 +60,9 @@ SIZE    = arm-none-eabi-size
 
 # Default for flags
 GCC_FLAGS ?=
+
+# Added flags
+GCC_FLAGS += -Os
 
 # Flags - Overall Options
 GCC_FLAGS += -specs=nosys.specs
