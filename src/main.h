@@ -22,7 +22,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
+
+#ifdef BOARD_MPPT
+#include "stm32f030f4_mppt.h"
+#else
 #include "stm32f0308_discovery.h"
+#endif
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

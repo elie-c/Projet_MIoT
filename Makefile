@@ -5,22 +5,29 @@
 TARGET_BOARD = MPPT
 # TARGET_BOARD = DISCOVERY
 
-SRC_FOLDER = ./src.old
-USE_ST_HAL = false
+#SRC_FOLDER = ./src.old
+SRC_FOLDER = ./src
+USE_ST_HAL = true
+
+#LINKER_SCRIPT = STM32F030F4P6_exp_FLASH.ld
 
 ####################
 
 # Variables specific to the board we use
 
 ifeq ($(TARGET_BOARD),MPPT)
-LINKER_SCRIPT = STM32F030x4.ld
+LINKER_SCRIPT ?= STM32F030x4.ld
 
 # Note: from smt32f0xx.h: STM32F030x6 is for both STM32F030x4 and STM32F030x6
 MAPPED_DEVICE = STM32F030x6
+
+OPEN_OCD_CONFIG_FILE = ./stm32f0discovery-4kbflash.cfg
 else
-LINKER_SCRIPT = STM32F051x8.ld 
+LINKER_SCRIPT = STM32F051x8.ld
 
 MAPPED_DEVICE = STM32F051x8
+
+OPEN_OCD_CONFIG_FILE = board/stm32f0discovery.cfg
 endif
 
 FLASH  = 0x08000000
@@ -29,7 +36,7 @@ SERIES_FOLDER = STM32F0xx
 
 
 #USE_ST_CMSIS = true
-USE_ST_HAL ?= true
+#USE_ST_HAL = true
 
 STARTUP_FOLDER = ./startup
 
@@ -63,6 +70,10 @@ GCC_FLAGS ?=
 
 # Added flags
 GCC_FLAGS += -Os
+
+ifeq ($(TARGET_BOARD),MPPT)
+GCC_FLAGS += -DBOARD_MPPT
+endif
 
 # Flags - Overall Options
 GCC_FLAGS += -specs=nosys.specs
@@ -124,6 +135,9 @@ SRC += $(wildcard $(SRC_FOLDER)/*.c)
 # Include user header files
 GCC_FLAGS += -I$(SRC_FOLDER)
 
+# Linker flags
+LD_FLAGS = -Xlinker --print-memory-usage
+
 # Startup file
 DEVICE_STARTUP = $(STARTUP_FOLDER)/$(MAPPED_DEVICE).s
 
@@ -155,9 +169,7 @@ $(BIN_FILE_PATH): $(ELF_FILE_PATH)
 	$(OBJCOPY) -O binary $^ $@
 
 $(ELF_FILE_PATH): $(OBJECT_FILES) $(OBJ_STARTUP_FILE_PATH) | $(BIN_FOLDER)
-	@echo "SRC = $(SRC)"
-	@echo "OBJ = $(OBJECT_FILES)"
-	$(CC) $(GCC_FLAGS) -o $@ $^
+	$(CC) $(GCC_FLAGS) $(LD_FLAGS) -o $@ $^
 
 %.o: %.c $(HEADERS_SRC)
 	$(CC) $(GCC_FLAGS) -c -o $@ $<
@@ -175,7 +187,7 @@ clean:
 
 upload: $(BIN_FOLDER)/$(ELF_FILE_NAME)
 #	openocd -f interface/stlink-v2.cfg -c "set WORKAREASIZE 0x2000" -f target/stm32f4x_stlink.cfg -c "program build/$(PROJECT).elf verify reset" # Older openocd
-	openocd -f board/stm32f0discovery.cfg -c "reset_config trst_only combined" -c "program $(BIN_FOLDER)/$(ELF_FILE_NAME) verify reset exit" # For openocd 0.9
+	openocd -f $(OPEN_OCD_CONFIG_FILE) -c "reset_config trst_only combined" -c "program $(BIN_FOLDER)/$(ELF_FILE_NAME) verify reset exit" # For openocd 0.9
 
 .PHONY: all clean upload
 
