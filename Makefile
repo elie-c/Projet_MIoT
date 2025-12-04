@@ -136,7 +136,7 @@ SRC += $(wildcard $(SRC_FOLDER)/*.c)
 GCC_FLAGS += -I$(SRC_FOLDER)
 
 # Linker flags
-LD_FLAGS = -Xlinker --print-memory-usage
+LD_FLAGS = -Xlinker --gc-sections -Xlinker --print-memory-usage
 
 # Startup file
 DEVICE_STARTUP = $(STARTUP_FOLDER)/$(MAPPED_DEVICE).s
@@ -169,7 +169,7 @@ $(BIN_FILE_PATH): $(ELF_FILE_PATH)
 	$(OBJCOPY) -O binary $^ $@
 
 $(ELF_FILE_PATH): $(OBJECT_FILES) $(OBJ_STARTUP_FILE_PATH) | $(BIN_FOLDER)
-	$(CC) $(GCC_FLAGS) $(LD_FLAGS) -o $@ $^
+	$(CC) $(LD_FLAGS) $(GCC_FLAGS) -o $@ $^
 
 %.o: %.c $(HEADERS_SRC)
 	$(CC) $(GCC_FLAGS) -c -o $@ $<
