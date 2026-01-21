@@ -1,2 +1,2 @@
 TARGET = zoul
-BOARD = firefly
+BOARD = remote-revb

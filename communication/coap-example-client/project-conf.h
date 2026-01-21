@@ -31,7 +31,7 @@
 
 /**
  * \file
- *      Erbium (Er) example project configuration.
+ *      CoAP client with 802.15.4 link-layer security configuration.
  * \author
  *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
  */
@@ -39,9 +39,34 @@
 #ifndef PROJECT_CONF_H_
 #define PROJECT_CONF_H_
 
+/* Enable client-side support for COAP observe */
+#define COAP_OBSERVE_CLIENT 1
+
+/* === Configuration sécurité 802.15.4 (Client) === */
+
+/* Activer la sécurité au niveau liaison 802.15.4 */
+#define LLSEC802154_CONF_ENABLED 1
+
+/* Clé K1 : Authentification des Enhanced Beacons (128 bits) */
+/* DOIT être identique au serveur */
+#define TSCH_SECURITY_CONF_K1 { 0x11, 0x11, 0x11, 0x11, \
+                                0x11, 0x11, 0x11, 0x11, \
+                                0x11, 0x11, 0x11, 0x11, \
+                                0x11, 0x11, 0x11, 0x11 }
+
+/* Clé K2 : Chiffrement/Authentification des trames DATA (128 bits) */
+/* DOIT être identique au serveur */
+#define TSCH_SECURITY_CONF_K2 { 0x22, 0x22, 0x22, 0x22, \
+                                0x22, 0x22, 0x22, 0x22, \
+                                0x22, 0x22, 0x22, 0x22, \
+                                0x22, 0x22, 0x22, 0x22 }
+
+/* === Logs de debug === */
+
+/* Logs application */
 #define LOG_LEVEL_APP LOG_LEVEL_DBG
 
-/* Enable client-side support for COAP observe */
-#define COAP_OBSERVE_CLIENT            1
+/* Logs CoAP */
+#define LOG_CONF_LEVEL_COAP LOG_LEVEL_DBG
 
 #endif /* PROJECT_CONF_H_ */
