@@ -6,3 +6,9 @@
 /.cproject
 /.project
 /.settings
+
+# vscode
+.vscode
+\#script#
+STM32F051x4 STM32F051x6.pdf
+
