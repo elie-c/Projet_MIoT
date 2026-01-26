@@ -1,2 +1,3 @@
 TARGET = zoul
-BOARD = remote-revb
+BOARD = firefly
+PORT=/dev/ttyUSB1
