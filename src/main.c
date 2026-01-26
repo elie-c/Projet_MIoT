@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "uart2.h"
 
 /** @addtogroup STM32F0xx_HAL_Demonstrations
  * @{
@@ -32,8 +33,8 @@ uint8_t BlinkSpeed = 0;
 #endif
 
 /* Private function prototypes -----------------------------------------------*/
-static void SystemClock_Config(void);
-static void Error_Handler(void);
+static void SystemClock_Config(void); 
+//static void MX_GPIO_Init(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -77,6 +78,12 @@ int main(void) {
 
   /* Initiate Blink Speed variable */ 
   BlinkSpeed = 1;
+
+
+    UART1_Init();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    UART1_SendString("UART OK \r\n");
+    UART1_StartReceiveIT();
 
   /* Infinite loop */
   while(1)
@@ -171,12 +178,13 @@ static void SystemClock_Config(void) {
 	}
 }
 
+
 /**
  * @brief  This function is executed in case of error occurrence.
  * @param  None
  * @retval None
  */
-static void Error_Handler(void) {
+ void Error_Handler(void) {
 	/* User may add here some code to deal with this error */
 	while (1) {
 	}
@@ -195,6 +203,7 @@ void assert_failed(uint8_t* file, uint32_t line)
 {
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
 
   /* Infinite loop */
   while (1)

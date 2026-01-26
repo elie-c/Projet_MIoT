@@ -23,6 +23,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
 
+void Error_Handler(void);
+
+
 #ifdef BOARD_MPPT
 #include "stm32f030f4_mppt.h"
 #else

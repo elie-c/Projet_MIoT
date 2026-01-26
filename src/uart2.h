@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 
 void UART1_Init(void);
 void UART1_SendChar(uint8_t c);
