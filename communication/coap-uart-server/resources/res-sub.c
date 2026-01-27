@@ -31,42 +31,40 @@
 
 /**
  * \file
- *      CoAP client with 802.15.4 link-layer security configuration.
+ *      Example resource
  * \author
  *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
  */
 
-#ifndef PROJECT_CONF_H_
-#define PROJECT_CONF_H_
+#include <stdio.h>
+#include <string.h>
+#include "coap-engine.h"
 
-/* Enable client-side support for COAP observe */
-#define COAP_OBSERVE_CLIENT 1
+static void res_get_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
-/* === Configuration sécurité 802.15.4 (Client) === */
+/*
+ * Example for a resource that also handles all its sub-resources.
+ * Use coap_get_url() to multiplex the handling of the request depending on the Uri-Path.
+ */
+PARENT_RESOURCE(res_sub,
+                "title=\"Sub-resource demo\"",
+                res_get_handler,
+                NULL,
+                NULL,
+                NULL);
 
-/* Activer la sécurité au niveau liaison 802.15.4 */
-#define LLSEC802154_CONF_ENABLED 1
+static void
+res_get_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+{
+  coap_set_header_content_format(response, TEXT_PLAIN);
 
-/* Clé K1 : Authentification des Enhanced Beacons (128 bits) */
-/* DOIT être identique au serveur */
-#define TSCH_SECURITY_CONF_K1 { 0x11, 0x11, 0x11, 0x11, \
-                                0x11, 0x11, 0x11, 0x11, \
-                                0x11, 0x11, 0x11, 0x11, \
-                                0x11, 0x11, 0x11, 0x11 }
+  const char *uri_path = NULL;
+  int len = coap_get_header_uri_path(request, &uri_path);
+  int base_len = strlen(res_sub.url);
 
-/* Clé K2 : Chiffrement/Authentification des trames DATA (128 bits) */
-/* DOIT être identique au serveur */
-#define TSCH_SECURITY_CONF_K2 { 0x22, 0x22, 0x22, 0x22, \
-                                0x22, 0x22, 0x22, 0x22, \
-                                0x22, 0x22, 0x22, 0x22, \
-                                0x22, 0x22, 0x22, 0x22 }
-
-/* === Logs de debug === */
-
-/* Logs application */
-#define LOG_LEVEL_APP LOG_LEVEL_DBG
-
-/* Logs CoAP */
-#define LOG_CONF_LEVEL_COAP LOG_LEVEL_DBG
-
-#endif /* PROJECT_CONF_H_ */
+  if(len == base_len) {
+    snprintf((char *)buffer, COAP_MAX_CHUNK_SIZE, "Request any sub-resource of /%s", res_sub.url);
+  } else {
+    snprintf((char *)buffer, COAP_MAX_CHUNK_SIZE, ".%.*s", len - base_len, uri_path + base_len);
+  } coap_set_payload(response, buffer, strlen((char *)buffer));
+}
