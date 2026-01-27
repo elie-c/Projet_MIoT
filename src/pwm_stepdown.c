@@ -59,10 +59,10 @@ void PWM_StepDown_Init(void)
     sConfigOC.OCMode       = TIM_OCMODE_PWM1;
     sConfigOC.Pulse        = (999 * current_duty) / 100;  /* Duty cycle normal */
     sConfigOC.OCPolarity   = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCNPolarity  = TIM_OCNPOLARITY_LOW;   /* Sortie complémentaire inversée */
+    sConfigOC.OCNPolarity  = TIM_OCNPOLARITY_HIGH;   /* Sortie N inversée automatiquement */
     sConfigOC.OCFastMode   = TIM_OCFAST_DISABLE;
     sConfigOC.OCIdleState  = TIM_OCIDLESTATE_RESET;
-    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_SET;
 
     if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, STEPDOWN_TIMER_CH3) != HAL_OK)
     {

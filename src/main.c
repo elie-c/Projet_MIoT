@@ -95,7 +95,7 @@ int main(void) {
   while(1)
   {
 
-     PWM_StepDown_SetDuty(25);  /* 25% duty cycle par défaut */
+     PWM_StepDown_SetDuty(25);  /* 50% duty cycle par défaut */
     UART2_SendString("PWM StepDown OK \r\n");
     /* Check if the user button is pressed */
     if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_SET)
