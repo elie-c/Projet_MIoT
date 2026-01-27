@@ -80,14 +80,17 @@ int main(void) {
   BlinkSpeed = 1;
 
 
-    UART1_Init();
+    UART2_Init();
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    UART1_SendString("UART OK \r\n");
-    UART1_StartReceiveIT();
+    UART2_SendString("UART OK \r\n");
+    UART2_StartReceiveIT();
+    
 
   /* Infinite loop */
   while(1)
-  {  
+  {
+
+    
     /* Check if the user button is pressed */
     if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_SET)
     {

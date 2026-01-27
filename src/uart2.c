@@ -8,7 +8,7 @@ static uint8_t rx_byte;
 /**
   * @brief Initialisation USART2
   */
-void UART1_Init(void)
+void UART2_Init(void)
 {
     huart2.Instance = USART2;
     huart2.Init.BaudRate = 115200;
@@ -40,14 +40,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
     if (huart->Instance == USART2)
     {
-        /*##-1- Enable peripherals and GPIO Clocks #################################*/
+        /*##-1- Enable peripherals and GPIO Clocks ##*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOA_CLK_ENABLE();
 
         /* Enable USART2 clock */
         __HAL_RCC_USART2_CLK_ENABLE();
 
-        /*##-2- Configure peripheral GPIO ##########################################*/
+        /*##-2- Configure peripheral GPIO ####*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
@@ -57,7 +57,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/
+        /*##-3- Configure the NVIC for UART ##*/
         /* NVIC for USART1 */
         HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(USART2_IRQn);
@@ -67,7 +67,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 /**
   * @brief Envoi d’un caractère
   */
-void UART1_SendChar(uint8_t c)
+void UART2_SendChar(uint8_t c)
 {
     HAL_UART_Transmit(&huart2, &c, 1, 100);
 }
@@ -75,7 +75,7 @@ void UART1_SendChar(uint8_t c)
 /**
   * @brief Envoi d’une chaîne
   */
-void UART1_SendString(char *str)
+void UART2_SendString(char *str)
 {
     HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 100);
 }
@@ -83,7 +83,7 @@ void UART1_SendString(char *str)
 /**
   * @brief Démarrer réception en interruption
   */
-void UART1_StartReceiveIT(void)
+void UART2_StartReceiveIT(void)
 {
     HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
 }
@@ -95,7 +95,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART2)
     {
-        UART1_SendChar(rx_byte); // echo
+        // Afficher le caractère reçu une fois
+        UART2_SendChar(rx_byte);
+        // Ajouter un retour à la ligne si Enter
+        if (rx_byte == '\r')
+        {
+            UART2_SendChar('\n');
+        }
+        // Redémarrer la réception
         HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
     }
 }
+    
+
