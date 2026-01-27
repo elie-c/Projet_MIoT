@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "uart2.h"
+#include "pwm_stepdown.h"
 
 /** @addtogroup STM32F0xx_HAL_Demonstrations
  * @{
@@ -84,6 +85,11 @@ int main(void) {
     __HAL_RCC_GPIOC_CLK_ENABLE();
     UART2_SendString("UART OK \r\n");
     UART2_StartReceiveIT();
+
+    /* Initialiser le PWM du step-down */
+    PWM_StepDown_Init();
+    PWM_StepDown_SetDuty(50);  /* 50% duty cycle par défaut */
+    UART2_SendString("PWM StepDown OK \r\n");
     
 
   /* Infinite loop */
