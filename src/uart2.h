@@ -12,5 +12,6 @@ void UART2_Init(void);
 void UART2_SendChar(uint8_t c);
 void UART2_SendString(char *str);
 void UART2_StartReceiveIT(void);
+void UART2_SendNextData(void);
 
 #endif /* UART2_H */

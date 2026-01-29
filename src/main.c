@@ -62,12 +62,22 @@ int main(void) {
 
 #ifdef BOARD_MPPT
 	BoardMppt_LED_Init();
+    UART2_Init();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    UART2_SendString("UART MPPT OK \r\n");
 
 	while (1) {
 		BoardMppt_LED_On();
 		HAL_Delay(500);
 		BoardMppt_LED_Off();
 		HAL_Delay(500);
+        
+        static uint32_t last_send_time_mppt = 0;
+        if (HAL_GetTick() - last_send_time_mppt >= 2000)
+        {
+            UART2_SendNextData();
+            last_send_time_mppt = HAL_GetTick();
+        }
 	}
 #else
   /* Configure LED3 and LED4 on STM32F0308-Discovery */
@@ -96,7 +106,7 @@ int main(void) {
   {
 
      PWM_StepDown_SetDuty(25);  /* 50% duty cycle par défaut */
-    UART2_SendString("PWM StepDown OK \r\n");
+   // UART2_SendString("PWM StepDown OK \r\n");
     /* Check if the user button is pressed */
     if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_SET)
     {
@@ -141,6 +151,14 @@ int main(void) {
     {  
       /* LED3 Off */
       BSP_LED_Off(LED3);
+    }
+    
+    /* Envoi des données MPPT toutes les 2 secondes */
+    static uint32_t last_send_time = 0;
+    if (HAL_GetTick() - last_send_time >= 2000)
+    {
+        UART2_SendNextData();
+        last_send_time = HAL_GetTick();
     }
   }
 #endif

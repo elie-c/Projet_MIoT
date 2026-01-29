@@ -1,6 +1,7 @@
 #include "uart2.h"
 #include "main.h"      // pour Error_Handler
 #include <string.h>
+#include <stdio.h>
 
 UART_HandleTypeDef huart2;
 static uint8_t rx_byte;
@@ -80,6 +81,12 @@ void UART2_SendString(char *str)
     HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 100);
 }
 
+void send_data(uint8_t *data, uint16_t size)
+{
+    HAL_UART_Transmit(&huart2, data, size, 100);
+}
+
+
 /**
   * @brief Démarrer réception en interruption
   */
@@ -91,17 +98,97 @@ void UART2_StartReceiveIT(void)
 /**
   * @brief Callback réception UART
   */
+#define RX_BUFFER_SIZE 32
+static char rx_buffer[RX_BUFFER_SIZE];
+static uint8_t rx_index = 0;
+
+/* Simulated values for MPPT */
+static uint16_t val_upan = 3200; // : 32.00 V
+static uint16_t val_ubat = 1250; // : 12.50 V
+static uint16_t val_cpan = 150;  // : 1.50 A
+static uint16_t val_cbat = 200;  // : 2.00 A
+static uint8_t val_soc = 85;     // : 85%
+
+void UART2_SendNextData(void) {
+    static uint8_t index = 0;
+    char tx_buffer[32];
+
+    switch (index) {
+        case 0:
+            sprintf(tx_buffer, "upan:%04d\n", val_upan);
+            break;
+        case 1:
+            sprintf(tx_buffer, "ubat:%04d\n", val_ubat);
+            break;
+        case 2:
+            sprintf(tx_buffer, "cpan:%04d\n", val_cpan);
+            break;
+        case 3:
+            sprintf(tx_buffer, "cbat:%04d\n", val_cbat);
+            break;
+        case 4:
+            sprintf(tx_buffer, "soc:%02d\n", val_soc);
+            break;
+        default:
+            index = 0;
+            return;
+    }
+    
+    UART2_SendString(tx_buffer);
+    
+    index++;
+    if (index > 4) {
+        index = 0;
+    }
+}
+
+void ProcessCommand(char *cmd) {
+    char tx_buffer[32];
+
+    if (strstr(cmd, "uPan") != NULL) {
+        sprintf(tx_buffer, "upan:%04d\r\n", val_upan);
+        UART2_SendString(tx_buffer);
+    } else if (strstr(cmd, "ubat") != NULL) {
+        sprintf(tx_buffer, "ubat:%04d\r\n", val_ubat);
+        UART2_SendString(tx_buffer);
+    } else if (strstr(cmd, "cpan") != NULL) {
+        sprintf(tx_buffer, "cpan:%04d\r\n", val_cpan);
+        UART2_SendString(tx_buffer);
+    } else if (strstr(cmd, "cbat") != NULL) {
+        sprintf(tx_buffer, "cbat:%04d\r\n", val_cbat);
+        UART2_SendString(tx_buffer);
+    } else if (strstr(cmd, "soc") != NULL) {
+        sprintf(tx_buffer, "soc:%02d\r\n", val_soc);
+        UART2_SendString(tx_buffer);
+    } else {
+        // Unknown command or just echo
+        // UART2_SendString("Unknown Command\r\n");
+    }
+}
+
+/**
+  * @brief Callback réception UART
+  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART2)
     {
-        // Afficher le caractère reçu une fois
-        UART2_SendChar(rx_byte);
-        // Ajouter un retour à la ligne si Enter
-        if (rx_byte == '\r')
-        {
-            UART2_SendChar('\n');
+        // Store received char
+        if (rx_index < RX_BUFFER_SIZE - 1) {
+            if (rx_byte == '\r' || rx_byte == '\n') {
+                rx_buffer[rx_index] = '\0'; // Terminate string
+                if (rx_index > 0) {
+                    ProcessCommand(rx_buffer);
+                }
+                rx_index = 0; // Reset buffer
+            } else {
+                rx_buffer[rx_index++] = rx_byte;
+            }
+        } else {
+            // Buffer overflow, reset
+            rx_index = 0;
         }
+
         // Redémarrer la réception
         HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
     }
