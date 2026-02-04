@@ -60,6 +60,8 @@ parse_uart_line(char *line)
   } else if(strcmp(line, "soc") == 0) {
     soc = value;
     LOG_INFO("UART: soc=%d\n", soc);
+  } else {
+    LOG_WARN("Unknown key in UART line: %s\n", line);
   }
 }
 

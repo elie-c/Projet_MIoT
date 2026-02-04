@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Log configuration */
+#include "sys/log.h"
+#define LOG_MODULE "App"
+#define LOG_LEVEL LOG_LEVEL_APP
+
 /*---------------------------------------------------------------------------*/
 PROCESS(uart_sender_process, "UART sender process");
 AUTOSTART_PROCESSES(&uart_sender_process);
@@ -53,7 +58,7 @@ PROCESS_THREAD(uart_sender_process, ev, data)
   printf("UART1 sender started - sending to JP3\n");
 
   /* Setup a periodic timer that expires after 1 second. */
-  etimer_set(&timer, CLOCK_SECOND * 1);
+  etimer_set(&timer, CLOCK_SECOND * 3);
 
   while(1) {
     /* Ici tu peux mettre à jour tes valeurs depuis des capteurs/ADC */
@@ -66,10 +71,15 @@ PROCESS_THREAD(uart_sender_process, ev, data)
 
     /* Envoi des données sur UART1 (JP3) */
     uart1_send_data("upan", upan, 4);
+    LOG_INFO("Sending upan: %u\n", upan);
     uart1_send_data("ubat", ubat, 4);
+    LOG_INFO("Sending ubat: %u\n", ubat);
     uart1_send_data("cpan", cpan, 4);
+    LOG_INFO("Sending cpan: %u\n", cpan);
     uart1_send_data("cbat", cbat, 4);
+    LOG_INFO("Sending cbat: %u\n", cbat);
     uart1_send_data("soc", soc, 2);
+    LOG_INFO("Sending soc: %u\n", soc);
 
     /* Wait for the periodic timer to expire and then restart the timer. */
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));

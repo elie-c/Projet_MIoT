@@ -3,3 +3,6 @@
 
 /* Baud rate pour UART1 (par défaut 115200) */
 #define UART1_CONF_BAUD_RATE 115200
+
+/* Logs application */
+#define LOG_LEVEL_APP LOG_LEVEL_DBG
