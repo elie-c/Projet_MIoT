@@ -31,7 +31,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart1;
 /* Private function prototypes -----------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -111,9 +111,9 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void USART2_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&huart2);
+  HAL_UART_IRQHandler(&huart1);
 }
 
 
